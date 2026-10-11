@@ -1,0 +1,6 @@
+# SYNTHETIC EXAMPLE SCHEMA FIXTURE - DO NOT USE AS REAL OBSERVATIONS OR EVALUATION DATA
+# All numerical values below are illustrative synthetic fixtures for schema validation only.
+participant_id,front_image_path,side_image_path,height_cm,weight_kg,chest_tape_cm,chest_tape_rep2_cm,waist_tape_cm,waist_tape_rep2_cm,hip_tape_cm,hip_tape_rep2_cm,shoulder_width_tape_cm,inseam_tape_cm,lighting_adequate,posture_upright,feet_visible,clothing_tight,protocol_version,consent_given,retention_agreed
+SYNTH_001,data/raw/synth_001_front.jpg,data/raw/synth_001_side.jpg,175.0,70.5,96.0,96.2,82.0,81.8,98.0,98.0,44.0,78.0,true,true,true,true,v1.0,true,true
+SYNTH_002,data/raw/synth_002_front.jpg,data/raw/synth_002_side.jpg,162.0,58.0,88.0,88.0,71.0,71.5,94.0,93.8,39.0,72.0,true,true,true,true,v1.0,true,true
+SYNTH_003,data/raw/synth_003_front.jpg,data/raw/synth_003_side.jpg,180.5,82.0,104.0,104.5,89.0,89.0,103.5,103.0,46.5,81.0,true,true,true,true,v1.0,true,true

@@ -1,0 +1,98 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual environments
+env/
+venv/
+.venv/
+ENV/
+env.bak/
+venv.bak/
+
+# User-requested exclusion: docs folder must not get into git
+docs/
+
+# Testing and coverage
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+.nox/
+coverage.xml
+*.cover
+
+# Static type checking
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# IDE / Editor configuration
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Operating System files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Private and participant data (AGENTS.md privacy rules)
+# NEVER commit raw participant photos, personal data, or local datasets
+data/raw/
+data/images/
+data/participants/
+data/*.csv
+!data/measurements.example.csv
+*.jpg
+*.jpeg
+*.png
+*.heic
+*.webp
+
+# Model binaries and large artifacts (must be downloaded or cached locally)
+models/*.task
+models/*.onnx
+models/*.tflite
+models/*.pb
+
+# Generated analysis outputs and diagnostic runs
+outputs/
+runs/
+reports/
+*.log
+
+# Environment variables and secrets
+.env
+.env.*
+!.env.example

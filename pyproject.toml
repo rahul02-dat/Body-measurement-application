@@ -1,0 +1,39 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "body-measurement"
+version = "0.1.0"
+description = "Research-first feasibility spike for photo-based body measurement and clothing-size recommendations"
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "Proprietary / Research"}
+authors = [
+    {name = "Research Team"}
+]
+dependencies = [
+    "numpy>=1.26.0",
+    "opencv-python>=4.8.0",
+    "mediapipe>=0.10.14",
+    "pandas>=2.1.0",
+    "scikit-learn>=1.3.0",
+    "matplotlib>=3.8.0",
+    "pydantic>=2.5.0",
+    "pillow>=10.0.0"
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4.0",
+    "pytest-cov>=4.1.0",
+    "ruff>=0.1.0"
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_functions = ["test_*"]
