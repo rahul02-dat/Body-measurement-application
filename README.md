@@ -141,7 +141,30 @@ python -m body_measurement.cli --run-synthetic-demo --output-dir reports
 
 Generated evaluation artifacts:
 - [`reports/FEASIBILITY_GATE_REPORT.md`](reports/FEASIBILITY_GATE_REPORT.md): Phase S0-H Feasibility Gate decision analysis against AGENTS.md provisional targets.
+- [`reports/FEASIBILITY_DECISION_RECORD.md`](reports/FEASIBILITY_DECISION_RECORD.md): Formal Architecture Decision Record approving Option A (Pilot Study).
 - [`reports/baseline_evaluation_report.md`](reports/baseline_evaluation_report.md): Circumference metrics, repeat variability, Uniqlo tops sizing confusion matrix.
 - [`reports/per_participant_predictions.csv`](reports/per_participant_predictions.csv): Machine-readable predictions, residuals, and rejection codes.
 - `reports/plots/`: Diagnostic error distributions, Bland-Altman agreement, and tape vs predicted scatter plots.
 - `reports/diagnostics/`: Visual overlays with chest, waist, and hip cross-section markers.
+
+---
+
+## 8. Physical Pilot Data Collection & Manifest Validation
+
+To prepare and validate physical volunteer data collection (20–30 subjects) according to the protocol:
+
+1. **Protocol & Intake Guide:** Review [`data/PILOT_INTAKE_CHECKLIST.md`](data/PILOT_INTAKE_CHECKLIST.md) for step-by-step consent, camera distance, level phone mounting, and repeat tape measuring procedures.
+2. **Pre-Run Manifest Validation:** Validate your local CSV manifest and ensure all images exist without corruption before running evaluation:
+
+```bash
+# Validate manifest schema, image presence, dimensions, and consent
+python -m body_measurement.cli --validate-manifest data/measurements.pilot.csv
+```
+
+3. **Run Evaluation Against Pilot Manifest:**
+
+```bash
+# Evaluate pilot cohort once photos and tape ground truth are captured
+python -m body_measurement.cli --evaluate-manifest data/measurements.pilot.csv --output-dir reports/pilot_evaluation
+```
+

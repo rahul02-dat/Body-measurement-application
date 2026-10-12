@@ -321,9 +321,88 @@ def evaluate_manifest(
     return summary, artifacts
 
 
+def validate_manifest_command(
+    manifest_csv: Union[str, Path],
+    base_dir: Optional[Union[str, Path]] = None,
+) -> bool:
+    """
+    Validate participant CSV manifest schema, data integrity, and local image file existence.
+    Returns True if manifest is completely valid, False if any errors are encountered.
+    """
+    path = Path(manifest_csv)
+    if not path.is_file():
+        print(f"Error: Manifest CSV file not found: {path}")
+        return False
+
+    root = Path(base_dir) if base_dir else Path.cwd()
+    print("=" * 60)
+    print(f"VALIDATING PARTICIPANT MANIFEST: {path.name}")
+    print(f"Base Directory: {root}")
+    print("=" * 60)
+
+    try:
+        records = load_participant_manifest(manifest_csv, base_dir=base_dir, verify_images_exist=False)
+    except Exception as e:
+        print(f"FAILED: Manifest parsing failed: {e}")
+        return False
+
+    if not records:
+        print("FAILED: Manifest is empty (no participant rows found).")
+        return False
+
+    errors: List[str] = []
+    warnings: List[str] = []
+
+    for idx, rec in enumerate(records, 1):
+        front_path = root / rec.front_image_path
+        side_path = root / rec.side_image_path
+
+        # Check image files exist
+        if not front_path.is_file():
+            errors.append(f"Row {idx} ({rec.participant_id}): Front image not found at '{front_path}'")
+        else:
+            try:
+                load_and_validate_image(front_path)
+            except Exception as e:
+                errors.append(f"Row {idx} ({rec.participant_id}): Front image unreadable/corrupt: {e}")
+
+        if not side_path.is_file():
+            errors.append(f"Row {idx} ({rec.participant_id}): Side image not found at '{side_path}'")
+        else:
+            try:
+                load_and_validate_image(side_path)
+            except Exception as e:
+                errors.append(f"Row {idx} ({rec.participant_id}): Side image unreadable/corrupt: {e}")
+
+        # Check consent
+        if not rec.consent_given:
+            errors.append(f"Row {idx} ({rec.participant_id}): consent_given is False (consent mandatory)")
+
+        if not rec.retention_agreed:
+            warnings.append(f"Row {idx} ({rec.participant_id}): retention_agreed is False (images must be deleted after run)")
+
+    total = len(records)
+    print(f"Total Participant Rows: {total}")
+    if errors:
+        print(f"Status: ❌ FAILED WITH {len(errors)} ERROR(S)")
+        for err in errors:
+            print(f"  - {err}")
+    else:
+        print("Status: ✅ PASSED (All records, schema constraints, and images verified)")
+
+    if warnings:
+        print(f"Notice: {len(warnings)} Warning(s):")
+        for warn in warnings:
+            print(f"  - {warn}")
+
+    print("=" * 60)
+    return len(errors) == 0
+
+
 def main():
     """Command-line entry point for running pose detection and evaluation batch jobs."""
     parser = argparse.ArgumentParser(description="MediaPipe Pose Detection & Evaluation Batch Processor")
+    parser.add_argument("--validate-manifest", type=str, help="Validate participant CSV manifest schema, data constraints, and image files on disk")
     parser.add_argument("--evaluate-manifest", type=str, help="Run end-to-end evaluation against a participant CSV manifest")
     parser.add_argument("--manifest", type=str, help="Path to participant CSV manifest for pose batch processing")
     parser.add_argument("--front", type=str, help="Path to single front image")
@@ -337,7 +416,14 @@ def main():
     out_dir = Path(args.output_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
 
-    if args.run_synthetic_demo:
+    if args.validate_manifest:
+        is_valid = validate_manifest_command(
+            manifest_csv=args.validate_manifest,
+            base_dir=args.base_dir,
+        )
+        import sys
+        sys.exit(0 if is_valid else 1)
+    elif args.run_synthetic_demo:
         from body_measurement.synthetic_demo import run_synthetic_feasibility_pipeline
         summary, artifacts = run_synthetic_feasibility_pipeline(output_dir=out_dir)
         print("=" * 60)

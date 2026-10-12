@@ -137,3 +137,52 @@ def test_cli_run_synthetic_demo(tmp_path, monkeypatch):
     assert (out_dir / "FEASIBILITY_GATE_REPORT.md").is_file()
     assert (out_dir / "per_participant_predictions.csv").is_file()
     assert (out_dir / "metrics_summary.json").is_file()
+
+
+def test_validate_manifest_command_valid(synthetic_pair):
+    """Verify validate_manifest_command returns True when manifest and images are valid."""
+    from body_measurement.cli import validate_manifest_command
+
+    result = validate_manifest_command(
+        manifest_csv=synthetic_pair["manifest"],
+        base_dir=synthetic_pair["base_dir"],
+    )
+    assert result is True
+
+
+def test_validate_manifest_command_missing_images(tmp_path):
+    """Verify validate_manifest_command returns False when referenced image files do not exist."""
+    from body_measurement.cli import validate_manifest_command
+
+    csv_file = tmp_path / "broken_manifest.csv"
+    csv_file.write_text(
+        "participant_id,front_image_path,side_image_path,height_cm,chest_tape_cm,waist_tape_cm,hip_tape_cm,"
+        "lighting_adequate,posture_upright,feet_visible,clothing_tight,protocol_version,consent_given,retention_agreed\n"
+        "TEST_999,nonexistent_f.jpg,nonexistent_s.jpg,175.0,95.0,80.0,98.0,true,true,true,true,v1.0,true,true\n",
+        encoding="utf-8",
+    )
+
+    result = validate_manifest_command(csv_file, base_dir=tmp_path)
+    assert result is False
+
+
+def test_cli_validate_manifest_flag(synthetic_pair, monkeypatch):
+    """Verify CLI main() dispatches --validate-manifest and exits 0 on valid manifest."""
+    from body_measurement.cli import main
+    import sys
+
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        [
+            "body-measurement",
+            "--validate-manifest",
+            str(synthetic_pair["manifest"]),
+            "--base-dir",
+            str(synthetic_pair["base_dir"]),
+        ],
+    )
+
+    with pytest.raises(SystemExit) as exc:
+        main()
+    assert exc.value.code == 0
