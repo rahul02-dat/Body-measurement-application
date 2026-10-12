@@ -91,7 +91,7 @@ models/*.pb
 # Generated analysis outputs and diagnostic runs
 outputs/
 runs/
-reports/
+reports/*
 !reports/*.md
 *.log
 
