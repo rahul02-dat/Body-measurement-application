@@ -11,6 +11,13 @@ matplotlib.use("Agg")  # Non-interactive backend for headless environments
 import matplotlib.pyplot as plt
 import numpy as np
 
+from body_measurement.sizing import (
+    SizingEvaluationResult,
+    evaluate_sizing_performance,
+    recommend_size,
+    UNIQLO_ADULT_TOPS_CHART,
+)
+
 
 @dataclass
 class MeasurementMetrics:
@@ -62,6 +69,10 @@ class ParticipantPredictionRow:
     chest_repeat_diff_cm: Optional[float] = None
     waist_repeat_diff_cm: Optional[float] = None
     hip_repeat_diff_cm: Optional[float] = None
+    ref_size: Optional[str] = None
+    pred_size: Optional[str] = None
+    is_size_exact: Optional[bool] = None
+    is_size_adjacent: Optional[bool] = None
 
 
 @dataclass
@@ -77,6 +88,7 @@ class EvaluationSummary:
     waist_metrics: Optional[MeasurementMetrics] = None
     hip_metrics: Optional[MeasurementMetrics] = None
     repeat_variability: Dict[str, RepeatVariabilityMetrics] = field(default_factory=dict)
+    sizing_result: Optional[SizingEvaluationResult] = None
     predictions: List[ParticipantPredictionRow] = field(default_factory=list)
 
 
@@ -182,6 +194,31 @@ def evaluate_predictions(predictions: List[ParticipantPredictionRow]) -> Evaluat
         "hip": calculate_repeat_variability("hip", [p.hip_repeat_diff_cm for p in predictions if p.hip_repeat_diff_cm is not None]),
     }
 
+    # Sizing evaluation (Uniqlo Adult Tops / T-Shirts)
+    sizing_comparisons = []
+    for p in predictions:
+        if p.chest_tape_cm is not None:
+            sizing_comparisons.append({
+                "participant_id": p.participant_id,
+                "ref_chest_cm": p.chest_tape_cm,
+                "ref_waist_cm": p.waist_tape_cm,
+                "pred_chest_cm": p.chest_pred_cm,
+                "pred_waist_cm": p.waist_pred_cm,
+            })
+
+    sizing_result = evaluate_sizing_performance(sizing_comparisons, chart=UNIQLO_ADULT_TOPS_CHART) if sizing_comparisons else None
+
+    # Update prediction rows with sizing metadata
+    if sizing_result:
+        sizing_map = {item["participant_id"]: item for item in sizing_result.participant_comparisons}
+        for p in predictions:
+            if p.participant_id in sizing_map:
+                s_info = sizing_map[p.participant_id]
+                p.ref_size = s_info["ref_size"]
+                p.pred_size = s_info["pred_size"]
+                p.is_size_exact = s_info["is_exact"]
+                p.is_size_adjacent = s_info["is_adjacent"]
+
     rejection_rate = round((len(rejected) / total * 100.0), 1) if total > 0 else 0.0
 
     return EvaluationSummary(
@@ -194,6 +231,7 @@ def evaluate_predictions(predictions: List[ParticipantPredictionRow]) -> Evaluat
         waist_metrics=waist_metrics,
         hip_metrics=hip_metrics,
         repeat_variability=repeat_metrics,
+        sizing_result=sizing_result,
         predictions=predictions,
     )
 
@@ -301,6 +339,7 @@ def export_predictions_csv(predictions: List[ParticipantPredictionRow], output_p
         "waist_tape_cm", "waist_pred_cm", "waist_error_cm", "waist_abs_error_cm",
         "hip_tape_cm", "hip_pred_cm", "hip_error_cm", "hip_abs_error_cm",
         "chest_repeat_diff_cm", "waist_repeat_diff_cm", "hip_repeat_diff_cm",
+        "ref_size", "pred_size", "is_size_exact", "is_size_adjacent",
     ]
     with open(output_path, "w", newline="", encoding="utf-8") as f:
         writer = csv.DictWriter(f, fieldnames=fieldnames)
@@ -362,9 +401,37 @@ def generate_markdown_report(summary: EvaluationSummary, output_path: Path, plot
         else:
             lines.append(f"| **{name.capitalize()}** | 0 | N/A | N/A | N/A |")
 
+    # Section 4: Sizing Recommendation Evaluation
+    if summary.sizing_result:
+        sr = summary.sizing_result
+        lines.extend([
+            "",
+            "## 4. Garment Size-Chart Recommendation Evaluation",
+            "",
+            f"- **Target Brand:** {sr.chart_brand}",
+            f"- **Garment Category:** {sr.chart_category}",
+            f"- **Exact-Size Agreement:** **{sr.exact_accuracy_pct:.1f}%** ({sr.exact_matches}/{sr.evaluated_count}) [Provisional Target: >= 80%]",
+            f"- **Adjacent-Size Agreement (±1 size):** **{sr.adjacent_accuracy_pct:.1f}%** ({sr.exact_matches + sr.adjacent_matches}/{sr.evaluated_count}) [Provisional Target: >= 95%]",
+            f"- **Abstention Rate:** {sr.abstention_rate_pct:.1f}% ({sr.abstention_count}/{sr.total_participants})",
+            f"- **Recommendation Coverage:** {sr.coverage_rate_pct:.1f}%",
+            "",
+            "### Size Recommendation Confusion Matrix (Reference vs Predicted):",
+            "",
+        ])
+
+        labels = UNIQLO_ADULT_TOPS_CHART.ordered_sizes + ["ABSTAIN"]
+        header = "| Ref \\ Pred | " + " | ".join(labels) + " |"
+        sep = "| :--- | " + " | ".join([":---"] * len(labels)) + " |"
+        lines.append(header)
+        lines.append(sep)
+
+        for ref_lbl in labels:
+            row_counts = [str(sr.confusion_matrix.get(ref_lbl, {}).get(pred_lbl, 0)) for pred_lbl in labels]
+            lines.append(f"| **{ref_lbl}** | " + " | ".join(row_counts) + " |")
+
     lines.extend([
         "",
-        "## 4. Key Limitations & Assumptions Disclosed",
+        "## 5. Key Limitations & Assumptions Disclosed",
         "",
         "1. **Ramanujan Ellipse Model:** Real human body cross-sections are irregular non-elliptical geometries; approximating them with orthogonal widths and depths creates an inherent geometric modeling error.",
         "2. **Attire & Slack:** Clothing thickness or fabric bunching introduces radial bias into the silhouette boundary.",
@@ -374,7 +441,7 @@ def generate_markdown_report(summary: EvaluationSummary, output_path: Path, plot
     ])
 
     if plot_paths:
-        lines.append("## 5. Diagnostic Error Plots")
+        lines.append("## 6. Diagnostic Error Plots")
         lines.append("")
         for p in plot_paths:
             lines.append(f"- **{p.stem.replace('_', ' ').capitalize()}:** `file://{p.resolve()}`")
@@ -412,6 +479,7 @@ def generate_evaluation_artifacts(
         "waist": asdict(summary.waist_metrics) if summary.waist_metrics else None,
         "hip": asdict(summary.hip_metrics) if summary.hip_metrics else None,
         "repeat_variability": {k: asdict(v) for k, v in summary.repeat_variability.items()},
+        "sizing": asdict(summary.sizing_result) if summary.sizing_result else None,
     }
     with open(metrics_json, "w", encoding="utf-8") as f:
         json.dump(summary_dict, f, indent=2)

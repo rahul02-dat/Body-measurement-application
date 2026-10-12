@@ -123,7 +123,7 @@ curl -o models/pose_landmarker_full.task https://storage.googleapis.com/mediapip
 - [x] **Phase S0-D**: Scale calibration (pixels-per-cm via height)
 - [x] **Phase S0-E**: Geometric baseline (Ramanujan ellipse approximation)
 - [x] **Phase S0-F**: Evaluation against ground-truth tape measurements
-- [ ] **Phase S0-G**: Size-chart evaluation & recommendation accuracy
+- [x] **Phase S0-G**: Size-chart evaluation & recommendation accuracy
 - [ ] **Phase S0-H**: Feasibility Gate Review (Decision: Proceed / Revise / Stop)
 - [ ] **Phase S1**: Optional calibration regression experiments
 - [ ] **Phase S2**: Mobile MVP (only after human approval)
