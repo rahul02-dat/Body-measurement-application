@@ -90,6 +90,7 @@ models/*.pb
 outputs/
 runs/
 reports/
+!reports/*.md
 *.log
 
 # Environment variables and secrets
