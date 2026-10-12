@@ -1,7 +1,7 @@
 """Diagnostic visual overlays generating side-by-side landmark skeleton and mask composites."""
 
 from pathlib import Path
-from typing import Optional, Union
+from typing import Dict, Optional, Union
 
 import cv2
 import numpy as np
@@ -171,3 +171,43 @@ def create_diagnostic_overlay(
         pil_img.save(out)
 
     return composite
+
+
+def draw_cross_section_overlay(
+    rgb_image: np.ndarray,
+    cross_sections: Dict[str, int],  # name -> y_px
+    measurements: Optional[Dict[str, float]] = None,  # name -> value_cm
+    line_thickness: int = 2,
+) -> np.ndarray:
+    """
+    Draw horizontal cross-section markers at chest, waist, and hip levels on an image copy.
+    """
+    annotated = rgb_image.copy()
+    h, w = annotated.shape[:2]
+
+    level_colors = {
+        "chest": (255, 105, 180),  # Hot pink in RGB
+        "waist": (0, 255, 128),    # Spring green
+        "hip": (30, 144, 255),     # Dodger blue
+    }
+
+    for name, y in cross_sections.items():
+        if 0 <= y < h:
+            color = level_colors.get(name.lower(), (255, 255, 0))
+            cv2.line(annotated, (0, y), (w, y), color, line_thickness, lineType=cv2.LINE_AA)
+            label = name.upper()
+            if measurements and name in measurements:
+                label += f": {measurements[name]:.1f}cm"
+            cv2.putText(
+                annotated,
+                label,
+                (10, max(20, y - 6)),
+                cv2.FONT_HERSHEY_SIMPLEX,
+                0.55,
+                color,
+                1,
+                cv2.LINE_AA,
+            )
+
+    return annotated
+
