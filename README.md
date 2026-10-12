@@ -120,7 +120,7 @@ curl -o models/pose_landmarker_full.task https://storage.googleapis.com/mediapip
 - [x] **Phase S0-A**: Repository and protocol setup
 - [x] **Phase S0-B**: Data schema validation & safe image loading
 - [x] **Phase S0-C**: Pose detection and segmentation pipeline
-- [ ] **Phase S0-D**: Scale calibration (pixels-per-cm via height)
+- [x] **Phase S0-D**: Scale calibration (pixels-per-cm via height)
 - [ ] **Phase S0-E**: Geometric baseline (Ramanujan ellipse approximation)
 - [ ] **Phase S0-F**: Evaluation against ground-truth tape measurements
 - [ ] **Phase S0-G**: Size-chart evaluation & recommendation accuracy
