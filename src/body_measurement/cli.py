@@ -408,6 +408,7 @@ def main():
     parser.add_argument("--front", type=str, help="Path to single front image")
     parser.add_argument("--side", type=str, help="Path to single side image")
     parser.add_argument("--run-synthetic-demo", action="store_true", help="Execute complete Phase S0-H synthetic feasibility pilot demo (N=25)")
+    parser.add_argument("--run-ansur-calibration", action="store_true", help="Execute Phase S1 anthropometric benchmark and Ridge calibration on ANSUR II (N=6,068)")
     parser.add_argument("--output-dir", type=str, default="reports", help="Directory for reports, plots, and diagnostic overlays")
     parser.add_argument("--base-dir", type=str, default=None, help="Base directory to resolve image paths against")
     parser.add_argument("--model-path", type=str, default="models/pose_landmarker_full.task", help="Path to Pose Landmarker .task model")
@@ -416,7 +417,17 @@ def main():
     out_dir = Path(args.output_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
 
-    if args.validate_manifest:
+    if args.run_ansur_calibration:
+        from body_measurement.calibration import run_ansur_calibration_pipeline
+        print("Executing Phase S1 Anthropometric Analysis & Calibration on ANSUR II...")
+        res = run_ansur_calibration_pipeline(reports_dir=out_dir)
+        print("=" * 60)
+        print("PHASE S1 ANSUR II CALIBRATION COMPLETED SUCCESSFULLY")
+        print(f"Total Subjects Evaluated: {res['calibration_experiment']['total_subjects']:,}")
+        print(f"Calibration Report:       {res['report_path']}")
+        print(f"Fitted Model Weights:     {res['models_path']}")
+        print("=" * 60)
+    elif args.validate_manifest:
         is_valid = validate_manifest_command(
             manifest_csv=args.validate_manifest,
             base_dir=args.base_dir,

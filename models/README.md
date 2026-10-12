@@ -41,3 +41,18 @@ When instantiated in Phase S0-C:
 - `min_pose_detection_confidence`: `0.7`
 - `min_pose_presence_confidence`: `0.7`
 - `min_tracking_confidence`: `0.7`
+
+---
+
+## 3. Phase S1 Calibration Regression Models
+
+- **Asset Path**: `models/calibration_models.json`
+- **Model Type**: Ridge Regression ($\alpha = 1.0$) with feature z-score standardization
+- **Training Cohort**: US Army Anthropometric Survey (ANSUR II, 2012, Natick TR-15/007; $N = 4,854$ training subjects, 5-fold cross-validation)
+- **Held-Out Test Set**: $N = 1,214$ untouched held-out subjects
+- **License / Provenance**: Public Domain (U.S. Federal Government Research)
+- **Features Used**:
+  - `chest`: `[chest_ramanujan_cm, height_cm, weight_kg]`
+  - `waist`: `[waist_ramanujan_cm, height_cm, weight_kg]`
+- **Validation Report**: [`reports/ANSUR_CALIBRATION_REPORT.md`](../reports/ANSUR_CALIBRATION_REPORT.md)
+

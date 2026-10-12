@@ -125,7 +125,7 @@ curl -o models/pose_landmarker_full.task https://storage.googleapis.com/mediapip
 - [x] **Phase S0-F**: Evaluation against ground-truth tape measurements
 - [x] **Phase S0-G**: Size-chart evaluation & recommendation accuracy
 - [x] **Phase S0-H**: Feasibility Gate Review (Synthetic pilot demo & decision report)
-- [ ] **Phase S1**: Optional calibration regression experiments
+- [x] **Phase S1**: Calibration regression experiments (ANSUR II Natick TR-15/007, N=6,068)
 - [ ] **Phase S2**: Mobile MVP (only after human approval)
 
 ---
@@ -167,4 +167,20 @@ python -m body_measurement.cli --validate-manifest data/measurements.pilot.csv
 # Evaluate pilot cohort once photos and tape ground truth are captured
 python -m body_measurement.cli --evaluate-manifest data/measurements.pilot.csv --output-dir reports/pilot_evaluation
 ```
+
+---
+
+## 9. Phase S1 Anthropometric Analysis & Ridge Calibration (ANSUR II)
+
+To reproduce the Phase S1 calibration benchmark on 6,068 physical subjects from the US Army Anthropometric Survey (ANSUR II, Natick TR-15/007):
+
+```bash
+# Execute Phase S1 anthropometric analysis and Ridge calibration
+python -m body_measurement.cli --run-ansur-calibration --output-dir reports
+```
+
+Generated calibration artifacts:
+- [`reports/ANSUR_CALIBRATION_REPORT.md`](reports/ANSUR_CALIBRATION_REPORT.md): Benchmarking Ramanujan ellipse error on real humans, aspect ratios, 5-fold CV feature comparison, and held-out test evaluations.
+- [`models/calibration_models.json`](models/calibration_models.json): Trained Ridge regression weights, intercepts, and feature standardizers.
+
 

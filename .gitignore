@@ -72,7 +72,9 @@ Thumbs.db
 data/raw/
 data/images/
 data/participants/
+data/ansur2/
 data/*.csv
+data/**/*.csv
 !data/measurements.example.csv
 *.jpg
 *.jpeg
