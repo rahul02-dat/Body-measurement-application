@@ -118,3 +118,22 @@ def test_run_batch_manifest(synthetic_pair, tmp_path):
 
     assert len(results) == 1
     assert (out_dir / "pose_batch_summary.json").is_file()
+
+
+def test_cli_run_synthetic_demo(tmp_path, monkeypatch):
+    """Verify CLI main() dispatches --run-synthetic-demo and produces reports."""
+    from body_measurement.cli import main
+    import sys
+
+    out_dir = tmp_path / "cli_demo_out"
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        ["body-measurement", "--run-synthetic-demo", "--output-dir", str(out_dir)],
+    )
+
+    main()
+
+    assert (out_dir / "FEASIBILITY_GATE_REPORT.md").is_file()
+    assert (out_dir / "per_participant_predictions.csv").is_file()
+    assert (out_dir / "metrics_summary.json").is_file()

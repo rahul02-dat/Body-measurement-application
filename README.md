@@ -2,7 +2,7 @@
 
 A research-first evaluation spike investigating whether two guided smartphone photographs (front and side) plus self-reported height can support reliable clothing-size recommendations.
 
-> **Status:** Phase S0-A (Repository and Protocol Setup)  
+> **Status:** Phase S0-H (Feasibility Gate Review Completed)  
 > **Experimental System Disclaimer:** This project is strictly experimental. Estimated measurements are **not** presented as exact, clinically validated, or suitable for bespoke tailoring. The primary goal is assessing whether photo-derived dimensions can reliably predict garment sizing for retail charts.
 
 ---
@@ -124,6 +124,24 @@ curl -o models/pose_landmarker_full.task https://storage.googleapis.com/mediapip
 - [x] **Phase S0-E**: Geometric baseline (Ramanujan ellipse approximation)
 - [x] **Phase S0-F**: Evaluation against ground-truth tape measurements
 - [x] **Phase S0-G**: Size-chart evaluation & recommendation accuracy
-- [ ] **Phase S0-H**: Feasibility Gate Review (Decision: Proceed / Revise / Stop)
+- [x] **Phase S0-H**: Feasibility Gate Review (Synthetic pilot demo & decision report)
 - [ ] **Phase S1**: Optional calibration regression experiments
 - [ ] **Phase S2**: Mobile MVP (only after human approval)
+
+---
+
+## 7. Running Evaluation & Synthetic Feasibility Demo
+
+To reproduce the Phase S0-H end-to-end synthetic feasibility evaluation (evaluating N=25 cohort, generating diagnostic plots, Uniqlo size accuracy, and Feasibility Gate report):
+
+```bash
+# Execute end-to-end synthetic feasibility pilot demo
+python -m body_measurement.cli --run-synthetic-demo --output-dir reports
+```
+
+Generated evaluation artifacts:
+- [`reports/FEASIBILITY_GATE_REPORT.md`](reports/FEASIBILITY_GATE_REPORT.md): Phase S0-H Feasibility Gate decision analysis against AGENTS.md provisional targets.
+- [`reports/baseline_evaluation_report.md`](reports/baseline_evaluation_report.md): Circumference metrics, repeat variability, Uniqlo tops sizing confusion matrix.
+- [`reports/per_participant_predictions.csv`](reports/per_participant_predictions.csv): Machine-readable predictions, residuals, and rejection codes.
+- `reports/plots/`: Diagnostic error distributions, Bland-Altman agreement, and tape vs predicted scatter plots.
+- `reports/diagnostics/`: Visual overlays with chest, waist, and hip cross-section markers.

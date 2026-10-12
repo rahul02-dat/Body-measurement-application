@@ -328,6 +328,7 @@ def main():
     parser.add_argument("--manifest", type=str, help="Path to participant CSV manifest for pose batch processing")
     parser.add_argument("--front", type=str, help="Path to single front image")
     parser.add_argument("--side", type=str, help="Path to single side image")
+    parser.add_argument("--run-synthetic-demo", action="store_true", help="Execute complete Phase S0-H synthetic feasibility pilot demo (N=25)")
     parser.add_argument("--output-dir", type=str, default="reports", help="Directory for reports, plots, and diagnostic overlays")
     parser.add_argument("--base-dir", type=str, default=None, help="Base directory to resolve image paths against")
     parser.add_argument("--model-path", type=str, default="models/pose_landmarker_full.task", help="Path to Pose Landmarker .task model")
@@ -336,7 +337,19 @@ def main():
     out_dir = Path(args.output_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
 
-    if args.evaluate_manifest:
+    if args.run_synthetic_demo:
+        from body_measurement.synthetic_demo import run_synthetic_feasibility_pipeline
+        summary, artifacts = run_synthetic_feasibility_pipeline(output_dir=out_dir)
+        print("=" * 60)
+        print("SYNTHETIC FEASIBILITY DEMO COMPLETED SUCCESSFULLY")
+        print(f"Total Cohort: {summary.total_records} | Success: {summary.successful_records} | Rejected: {summary.rejected_records}")
+        print(f"Feasibility Gate Report: {artifacts['feasibility_report']}")
+        print(f"Baseline Report Markdown: {artifacts['report_md']}")
+        print(f"Predictions CSV:         {artifacts['pred_csv']}")
+        print(f"Metrics JSON:            {artifacts['metrics_json']}")
+        print(f"Diagnostic Plots:        {len(artifacts['plots'])} plot(s) generated")
+        print("=" * 60)
+    elif args.evaluate_manifest:
         summary, artifacts = evaluate_manifest(
             manifest_csv=args.evaluate_manifest,
             output_dir=out_dir,
