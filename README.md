@@ -183,4 +183,39 @@ Generated calibration artifacts:
 - [`reports/ANSUR_CALIBRATION_REPORT.md`](reports/ANSUR_CALIBRATION_REPORT.md): Benchmarking Ramanujan ellipse error on real humans, aspect ratios, 5-fold CV feature comparison, and held-out test evaluations.
 - [`models/calibration_models.json`](models/calibration_models.json): Trained Ridge regression weights, intercepts, and feature standardizers.
 
+---
+
+## 10. Phase S2 React Native Mobile MVP (`mobile/`)
+
+The mobile client is built with **React Native (Expo TypeScript)** and features a guided hands-free camera wizard:
+
+### Mobile Screen Architecture:
+1. **Details & Stature Screen (`mobile/src/screens/DetailsScreen.tsx`):**
+   - User enters standing height (scale anchor) and optional weight.
+   - Explicit DPDP informed consent and memory retention toggles.
+2. **Guided Front Capture (`mobile/src/screens/FrontCaptureScreen.tsx`):**
+   - Live silhouette wireframe overlay with crown/feet limits and arm abduction guides.
+   - Real-time level pitch indicator ($\le 8^\circ$ green / $>8^\circ$ red tilt warning).
+   - 3-second stance stabilization countdown ring for hands-free auto-trigger.
+3. **Guided Side Profile Capture (`mobile/src/screens/SideCaptureScreen.tsx`):**
+   - 90° profile posture guide with bust, waist, and gluteal depth indicators.
+   - Distance consistency verification between shots.
+4. **On-Device Processing Gate (`mobile/src/screens/ProcessingScreen.tsx`):**
+   - Runs full scale calibration, Ramanujan ellipse geometry, and ANSUR II Ridge ML.
+   - Structured rejection handling with clear retake guidelines if framing fails.
+5. **Results & Sizing Screen (`mobile/src/screens/ResultsScreen.tsx`):**
+   - Uniqlo Adult Tops recommendation badge (XS–XXL) and full size spectrum.
+   - Circumferences breakdown with raw vs. calibrated toggle.
+   - Manual value adjustments (clearly tagged as "USER ADJUSTED" vs "MODEL ESTIMATE").
+   - Instant session memory purge ("Clear & Delete Data").
+
+### Verification & Testing:
+To verify that the mobile TypeScript engine matches the Python mathematical reference engine with 100% parity:
+
+```bash
+# Run standalone zero-dependency mathematical parity test suite
+node mobile/scripts/verify_engine.js
+```
+
+
 
