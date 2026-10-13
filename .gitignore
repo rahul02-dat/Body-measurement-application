@@ -99,3 +99,12 @@ reports/*
 .env
 .env.*
 !.env.example
+
+# Node / Mobile (Expo)
+node_modules/
+mobile/node_modules/
+.expo/
+mobile/.expo/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
