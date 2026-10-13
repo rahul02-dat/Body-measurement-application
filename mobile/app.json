@@ -16,14 +16,6 @@
     },
     "android": {
       "permissions": ["android.permission.CAMERA"]
-    },
-    "plugins": [
-      [
-        "expo-camera",
-        {
-          "cameraPermission": "TailorFit requires camera access to capture front and profile views for body dimension estimation."
-        }
-      ]
-    ]
+    }
   }
 }
