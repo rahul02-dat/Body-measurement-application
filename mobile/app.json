@@ -1,0 +1,29 @@
+{
+  "expo": {
+    "name": "TailorFit Mobile",
+    "slug": "tailorfit-mobile",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "dark",
+    "splash": {
+      "backgroundColor": "#080C15"
+    },
+    "ios": {
+      "supportsTablet": false,
+      "infoPlist": {
+        "NSCameraUsageDescription": "TailorFit requires camera access to capture front and profile views for body dimension estimation."
+      }
+    },
+    "android": {
+      "permissions": ["android.permission.CAMERA"]
+    },
+    "plugins": [
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "TailorFit requires camera access to capture front and profile views for body dimension estimation."
+        }
+      ]
+    ]
+  }
+}

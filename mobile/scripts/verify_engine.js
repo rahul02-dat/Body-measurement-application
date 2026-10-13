@@ -118,6 +118,28 @@ function recommendSize(chestCm, waistCm) {
   return { status: "RECOMMENDED", size: cSize, accommodating: false };
 }
 
+// 6. End-to-End Pipeline Simulator
+function runPipelineSimulator(heightCm, weightKg, frontW, sideD) {
+  // Scale calibration
+  const scale = calibrateScale(heightCm, 1000, 0.0);
+  assert.strictEqual(scale.isValid, true);
+
+  // Cross section widths (px to cm)
+  const chestW_cm = frontW * scale.cmPerPixel;
+  const chestD_cm = sideD * scale.cmPerPixel;
+
+  // Ramanujan
+  const rawCirc = calculateEllipseCircumference(chestW_cm, chestD_cm);
+
+  // Ridge
+  const calCirc = calibrateRidge("chest", rawCirc, heightCm, weightKg);
+
+  // Size
+  const sizing = recommendSize(calCirc, 82.0);
+
+  return { rawCirc, calCirc, sizing };
+}
+
 // RUN TESTS
 console.log("=" .repeat(60));
 console.log("RUNNING MOBILE REFERENCE ENGINE MATHEMATICAL PARITY CHECKS");
@@ -169,6 +191,13 @@ assert.strictEqual(recommendSize(70.0).status, "ABSTAIN_OUT_OF_BOUNDS");
 assert.strictEqual(recommendSize(null).status, "ABSTAIN_MISSING_INPUT");
 console.log("✔ Test 7: Accommodating fit (Chest S, Waist M -> M) and abstentions PASSED");
 
+// Test 8: End-to-End Pipeline Simulator
+const pipe = runPipelineSimulator(175.0, 70.0, 180, 130);
+assert.strictEqual(pipe.rawCirc > 0, true);
+assert.strictEqual(pipe.calCirc > 0, true);
+assert.strictEqual(pipe.sizing.status, "RECOMMENDED");
+console.log("✔ Test 8: End-to-end measurement & sizing pipeline simulation PASSED");
+
 console.log("=" .repeat(60));
-console.log("ALL 7 PARITY VERIFICATION CHECKS PASSED WITH 100% ACCURACY!");
+console.log("ALL 8 PARITY VERIFICATION CHECKS PASSED WITH 100% ACCURACY!");
 console.log("=" .repeat(60));

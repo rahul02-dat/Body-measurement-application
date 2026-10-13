@@ -4,13 +4,12 @@
     "module": "CommonJS",
     "lib": ["ES2020"],
     "declaration": true,
-    "outDir": "./dist",
-    "rootDir": "./src",
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true
+    "forceConsistentCasingInFileNames": true,
+    "jsx": "react-native"
   },
-  "include": ["src/**/*"],
+  "include": ["src/**/*", "App.tsx", "index.js"],
   "exclude": ["node_modules", "dist", "__tests__"]
 }
