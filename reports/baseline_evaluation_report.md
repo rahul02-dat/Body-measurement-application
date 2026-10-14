@@ -58,7 +58,7 @@
 
 ## 6. Diagnostic Error Plots
 
-- **Tape vs predicted scatter:** `file:///Users/rahulmac/Documents/Projects/Body-Measurement-App/reports/plots/tape_vs_predicted_scatter.png`
-- **Error distribution histograms:** `file:///Users/rahulmac/Documents/Projects/Body-Measurement-App/reports/plots/error_distribution_histograms.png`
-- **Bland altman plots:** `file:///Users/rahulmac/Documents/Projects/Body-Measurement-App/reports/plots/bland_altman_plots.png`
+- **Tape vs predicted scatter:** `plots/tape_vs_predicted_scatter.png`
+- **Error distribution histograms:** `plots/error_distribution_histograms.png`
+- **Bland altman plots:** `plots/bland_altman_plots.png`
 

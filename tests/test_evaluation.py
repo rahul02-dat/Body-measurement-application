@@ -122,6 +122,10 @@ def test_generate_evaluation_artifacts(tmp_path):
     assert "Key Limitations & Assumptions Disclosed" in report_text
 
 
+@pytest.mark.skipif(
+    not Path("models/pose_landmarker_full.task").is_file(),
+    reason="MediaPipe model binary not downloaded",
+)
 def test_evaluate_manifest_missing_images_rejection(tmp_path):
     """Verify evaluate_manifest records rejection when referenced images are missing."""
     csv_file = tmp_path / "manifest.csv"

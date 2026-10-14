@@ -10,9 +10,9 @@ interface HeaderProps {
 }
 
 const STEPS: { key: WizardStep; label: string; number: number }[] = [
-  { key: "DETAILS", label: "Profile", number: 1 },
+  { key: "DETAILS", label: "Details", number: 1 },
   { key: "FRONT_CAPTURE", label: "Front", number: 2 },
-  { key: "SIDE_CAPTURE", label: "Profile", number: 3 },
+  { key: "SIDE_CAPTURE", label: "Side View", number: 3 },
   { key: "RESULTS", label: "Sizing", number: 4 },
 ];
 

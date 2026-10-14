@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { CameraView, useCameraPermissions } from "expo-camera";
 import { LevelIndicator } from "../components/LevelIndicator";
@@ -17,11 +17,13 @@ export const SideCaptureScreen: React.FC<SideCaptureScreenProps> = ({
   onRetakeFront,
 }) => {
   const [permission, requestPermission] = useCameraPermissions();
+  const cameraRef = useRef<CameraView>(null);
   const [facing, setFacing] = useState<"front" | "back">("back");
   const [tiltDegrees, setTiltDegrees] = useState<number>(0.3);
   const [isAligned, setIsAligned] = useState<boolean>(true);
   const [countdownSeconds, setCountdownSeconds] = useState<number>(3);
   const [isCountingDown, setIsCountingDown] = useState<boolean>(false);
+  const [isProcessingCapture, setIsProcessingCapture] = useState<boolean>(false);
   const [instructionText, setInstructionText] = useState<string>(
     "Turn 90° into profile view. Keep same distance from camera. Hold position."
   );
@@ -50,16 +52,42 @@ export const SideCaptureScreen: React.FC<SideCaptureScreenProps> = ({
     };
   }, [isAligned, tiltDegrees]);
 
-  const handleCaptureComplete = () => {
-    const frame: CapturedFrame = {
-      uri: "local://side_capture.jpg",
-      width: 1080,
-      height: 1920,
-      timestamp: Date.now(),
-      view: "side",
-      tiltAngleDegrees: tiltDegrees,
-    };
-    onCapture(frame);
+  const handleCaptureComplete = async () => {
+    if (isProcessingCapture) return;
+    setIsProcessingCapture(true);
+    try {
+      let uri = "local://side_capture.jpg";
+      let width = 1080;
+      let height = 1920;
+
+      if (cameraRef.current && permission?.granted) {
+        try {
+          const photo = await cameraRef.current.takePictureAsync({
+            quality: 0.85,
+            skipProcessing: true,
+          });
+          if (photo?.uri) {
+            uri = photo.uri;
+            width = photo.width || width;
+            height = photo.height || height;
+          }
+        } catch (e) {
+          console.warn("takePictureAsync fallback to mock frame:", e);
+        }
+      }
+
+      const frame: CapturedFrame = {
+        uri,
+        width,
+        height,
+        timestamp: Date.now(),
+        view: "side",
+        tiltAngleDegrees: tiltDegrees,
+      };
+      onCapture(frame);
+    } finally {
+      setIsProcessingCapture(false);
+    }
   };
 
   return (
@@ -81,6 +109,7 @@ export const SideCaptureScreen: React.FC<SideCaptureScreenProps> = ({
       <View style={styles.cameraViewport}>
         {permission?.granted ? (
           <CameraView
+            ref={cameraRef}
             style={StyleSheet.absoluteFill}
             facing={facing}
           />

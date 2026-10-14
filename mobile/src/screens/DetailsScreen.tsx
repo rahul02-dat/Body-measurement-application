@@ -29,7 +29,9 @@ export const DetailsScreen: React.FC<DetailsScreenProps> = ({
     initialDetails.heightCm > 0 ? initialDetails.heightCm.toString() : "175.0"
   );
   const [weightKg, setWeightKg] = useState<string>(
-    initialDetails.weightKg ? initialDetails.weightKg.toString() : "70.0"
+    initialDetails.weightKg !== null && initialDetails.weightKg !== undefined
+      ? initialDetails.weightKg.toString()
+      : ""
   );
   const [consentGiven, setConsentGiven] = useState<boolean>(initialDetails.consentGiven);
   const [retentionAgreed, setRetentionAgreed] = useState<boolean>(initialDetails.retentionAgreed);
@@ -40,13 +42,13 @@ export const DetailsScreen: React.FC<DetailsScreenProps> = ({
     const parsedHeight = parseFloat(heightCm);
     const parsedWeight = weightKg.trim() ? parseFloat(weightKg) : null;
 
-    if (isNaN(parsedHeight) || parsedHeight < 50 || parsedHeight > 260) {
-      setErrorMessage("Please enter a valid height between 50 cm and 260 cm.");
+    if (isNaN(parsedHeight) || parsedHeight < 100 || parsedHeight > 230) {
+      setErrorMessage("Please enter a valid standing height between 100 cm and 230 cm.");
       return null;
     }
 
-    if (parsedWeight !== null && (isNaN(parsedWeight) || parsedWeight < 30 || parsedWeight > 300)) {
-      setErrorMessage("Please enter a valid weight between 30 kg and 300 kg (or leave blank).");
+    if (parsedWeight !== null && (isNaN(parsedWeight) || parsedWeight < 30 || parsedWeight > 250)) {
+      setErrorMessage("Please enter a valid weight between 30 kg and 250 kg (or leave blank).");
       return null;
     }
 

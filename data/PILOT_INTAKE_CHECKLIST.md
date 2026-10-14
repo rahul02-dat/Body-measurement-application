@@ -1,6 +1,6 @@
 # Pilot Volunteer Data Collection Intake Checklist
 
-This checklist guides the collection of physical ground truth tape measurements and photograph capture for the **20–30 volunteer pilot study** in accordance with [AGENTS.md](file:///Users/rahulmac/Documents/Projects/Body-Measurement-App/AGENTS.md) and [data/README.md](file:///Users/rahulmac/Documents/Projects/Body-Measurement-App/data/README.md).
+This checklist guides the collection of physical ground truth tape measurements and photograph capture for the **20–30 volunteer pilot study** in accordance with [AGENTS.md](../AGENTS.md) and [data/README.md](./README.md).
 
 ---
 

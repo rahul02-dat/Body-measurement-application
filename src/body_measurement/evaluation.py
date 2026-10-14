@@ -444,7 +444,11 @@ def generate_markdown_report(summary: EvaluationSummary, output_path: Path, plot
         lines.append("## 6. Diagnostic Error Plots")
         lines.append("")
         for p in plot_paths:
-            lines.append(f"- **{p.stem.replace('_', ' ').capitalize()}:** `file://{p.resolve()}`")
+            try:
+                rel_path = p.relative_to(output_path.parent)
+            except ValueError:
+                rel_path = p.name
+            lines.append(f"- **{p.stem.replace('_', ' ').capitalize()}:** `{rel_path}`")
         lines.append("")
 
     with open(output_path, "w", encoding="utf-8") as f:

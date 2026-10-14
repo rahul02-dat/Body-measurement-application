@@ -141,7 +141,7 @@ export const LiveCameraScreen: React.FC<LiveCameraScreenProps> = ({
   // Save height modal
   const handleSaveHeight = () => {
     const parsed = parseFloat(tempHeightInput);
-    if (!isNaN(parsed) && parsed >= 50 && parsed <= 260) {
+    if (!isNaN(parsed) && parsed >= 100 && parsed <= 230) {
       onUpdateHeight(parsed);
       setShowHeightModal(false);
     }
@@ -327,7 +327,7 @@ export const LiveCameraScreen: React.FC<LiveCameraScreenProps> = ({
             <View style={styles.viewportTopBar}>
               <View style={styles.liveIndicatorPill}>
                 <View style={styles.livePulseDot} />
-                <Text style={styles.liveText}>LIVE AR SCAN</Text>
+                <Text style={styles.liveText}>STATURE VIEWFINDER</Text>
               </View>
 
               <View style={styles.levelPill}>
@@ -348,6 +348,13 @@ export const LiveCameraScreen: React.FC<LiveCameraScreenProps> = ({
         )}
       </View>
 
+      {/* Physics Notice Banner */}
+      <View style={styles.physicsNoticeBar}>
+        <Text style={styles.physicsNoticeText}>
+          ⚠️ 2D Camera Limitation: Single camera cannot measure sagittal depth. Values are stature-ratio projections from height, not 3D optical inference.
+        </Text>
+      </View>
+
       {/* 2. Floating Bottom HUD & Controls */}
       <View style={styles.bottomHudCard}>
         {/* Real-time Sizing Banner */}
@@ -355,15 +362,27 @@ export const LiveCameraScreen: React.FC<LiveCameraScreenProps> = ({
           <View style={styles.sizeResultBox}>
             <Text style={styles.sizeBrandLabel}>RECOMMENDED SIZE ({UNIQLO_ADULT_TOPS_CHART.brand})</Text>
             <View style={styles.sizeValueRow}>
-              <Text style={styles.sizeBadge}>{sizingRecommendation.recommendedSize || "M"}</Text>
-              <View style={styles.sizeMetaBox}>
-                <Text style={styles.fitStatusText}>
-                  {sizingRecommendation.status === "RECOMMENDED" ? "Optimal Fit" : "Evaluation Active"}
-                </Text>
-                <Text style={styles.fitNotesText} numberOfLines={1}>
-                  {sizingRecommendation.notes || "Based on Chest & Waist Calipers"}
-                </Text>
-              </View>
+              {sizingRecommendation.status === "RECOMMENDED" && sizingRecommendation.recommendedSize ? (
+                <>
+                  <Text style={styles.sizeBadge}>{sizingRecommendation.recommendedSize}</Text>
+                  <View style={styles.sizeMetaBox}>
+                    <Text style={styles.fitStatusText}>Size Match</Text>
+                    <Text style={styles.fitNotesText} numberOfLines={1}>
+                      {sizingRecommendation.notes || "Based on Chest & Waist"}
+                    </Text>
+                  </View>
+                </>
+              ) : (
+                <>
+                  <Text style={[styles.sizeBadge, { backgroundColor: "#334155", color: "#94A3B8" }]}>—</Text>
+                  <View style={styles.sizeMetaBox}>
+                    <Text style={[styles.fitStatusText, { color: colors.warning }]}>Cannot Recommend</Text>
+                    <Text style={styles.fitNotesText} numberOfLines={1}>
+                      {sizingRecommendation.abstentionReason || "Outside chart range"}
+                    </Text>
+                  </View>
+                </>
+              )}
             </View>
           </View>
 
@@ -1081,5 +1100,18 @@ const styles = StyleSheet.create({
     color: "#04151F",
     fontSize: 13,
     fontWeight: "800",
+  },
+  physicsNoticeBar: {
+    backgroundColor: "rgba(30, 41, 59, 0.9)",
+    borderBottomWidth: 1,
+    borderBottomColor: "rgba(51, 65, 85, 0.6)",
+    paddingVertical: 6,
+    paddingHorizontal: 16,
+  },
+  physicsNoticeText: {
+    fontSize: 11,
+    color: "#FBBF24",
+    textAlign: "center",
+    lineHeight: 15,
   },
 });

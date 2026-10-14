@@ -371,7 +371,7 @@ According to **AGENTS.md Section 5 (Phase S0-H)**, the baseline feasibility is e
 | **Waist Circumference MAE** | `<= 2.0 cm` | **{w.mae if w else 'N/A':.2f} cm** | {'✅ PASS' if w_pass else '❌ MISS'} |
 | **Hip Circumference MAE** | `<= 2.0 cm` | **{h.mae if h else 'N/A':.2f} cm** | {'✅ PASS' if h_pass else '❌ MISS'} |
 | **Uniqlo Exact-Size Agreement** | `>= 80.0%` | **{sz.exact_accuracy_pct if sz else 0.0:.1f}%** ({sz.exact_matches if sz else 0}/{sz.evaluated_count if sz else 0}) | {'✅ PASS' if exact_sz_pass else '⚠️ BORDERLINE / MISS'} |
-| **Uniqlo Adjacent-Size Agreement (±1)** | `>= 95.0%` | **{sz.adjacent_accuracy_pct if sz else 0.0:.1f}%** ({sz.adjacent_matches if sz else 0}/{sz.evaluated_count if sz else 0}) | {'✅ PASS' if adj_sz_pass else '❌ MISS'} |
+| **Uniqlo Adjacent-Size Agreement (±1)** | `>= 95.0%` | **{sz.adjacent_accuracy_pct if sz else 0.0:.1f}%** ({(sz.exact_matches + sz.adjacent_matches) if sz else 0}/{sz.evaluated_count if sz else 0}) | {'✅ PASS' if adj_sz_pass else '❌ MISS'} |
 | **Fail-Safe Rejection Tracking** | Explicit codes | **{summary.rejection_rate:.1f}%** ({summary.rejected_records}/{summary.total_records}) | ✅ PASS |
 
 ---

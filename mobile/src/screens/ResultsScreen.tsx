@@ -221,16 +221,16 @@ export const ResultsScreen: React.FC<ResultsScreenProps> = ({
         </View>
       </View>
 
-      {/* SMPL-Anthropometry Standard Literature Measurements (A–P) */}
+      {/* Reference Literature Anthropometry Stature Multipliers (A–P) */}
       <View style={styles.card}>
         <View style={styles.cardHeader}>
-          <Text style={styles.cardTitle}>SMPL-Anthropometry Standard (A–P)</Text>
-          <View style={[styles.statusBadge, styles.statusBadgeEstimated]}>
-            <Text style={[styles.statusBadgeText, styles.statusBadgeTextEstimated]}>ISO 7250 / ANSUR</Text>
+          <Text style={styles.cardTitle}>Reference Stature Proportions (A–P)</Text>
+          <View style={[styles.statusBadge, styles.statusBadgeEdited]}>
+            <Text style={[styles.statusBadgeText, styles.statusBadgeTextEdited]}>THEORETICAL RATIOS</Text>
           </View>
         </View>
         <Text style={styles.anthroSubtitle}>
-          Measurement extraction suite synchronized with DavidBoja/SMPL-Anthropometry.
+          ⚠️ Anthropometric reference values scaled from height using DavidBoja/SMPL-Anthropometry literature ratios. These are theoretical statistical multipliers for 3D modeling reference, NOT optical measurements from your photos.
         </Text>
 
         <View style={styles.anthroGrid}>

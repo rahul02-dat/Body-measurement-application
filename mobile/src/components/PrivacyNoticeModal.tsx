@@ -19,28 +19,28 @@ export const PrivacyNoticeModal: React.FC<PrivacyNoticeModalProps> = ({ visible,
             <View style={styles.bulletItem}>
               <Text style={styles.bulletDot}>•</Text>
               <Text style={styles.bulletText}>
-                <Text style={styles.bold}>100% On-Device Processing:</Text> Your photographs are analyzed locally in volatile memory. No images or biometric records are ever uploaded to cloud servers.
+                <Text style={styles.bold}>No Persistent Storage:</Text> Photos are processed in volatile session memory during the active scan. No images are saved to your photo roll, local disk database, or external servers.
               </Text>
             </View>
 
             <View style={styles.bulletItem}>
               <Text style={styles.bulletDot}>•</Text>
               <Text style={styles.bulletText}>
-                <Text style={styles.bold}>Immediate Data Deletion:</Text> Tapping "Clear & Delete Data" instantly flushes all captured images from your device's memory.
+                <Text style={styles.bold}>Immediate Session Flush:</Text> Resetting the session or leaving the app immediately clears all in-memory frames and calculated measurements.
               </Text>
             </View>
 
             <View style={styles.bulletItem}>
               <Text style={styles.bulletDot}>•</Text>
               <Text style={styles.bulletText}>
-                <Text style={styles.bold}>Experimental Prototype:</Text> Measurements are approximations for garment size recommendations. They are not certified for medical, fitness, or bespoke tailoring use.
+                <Text style={styles.bold}>Experimental Prototype:</Text> Measurements are approximations for garment size recommendations under study. They are not certified for medical, fitness, or bespoke tailoring use.
               </Text>
             </View>
 
             <View style={styles.bulletItem}>
               <Text style={styles.bulletDot}>•</Text>
               <Text style={styles.bulletText}>
-                <Text style={styles.bold}>Informed Consent:</Text> Continued use confirms your voluntary consent to process full-body photographs for clothing size estimation.
+                <Text style={styles.bold}>Voluntary Informed Consent:</Text> Continued use confirms your voluntary consent to process photos for clothing size estimation.
               </Text>
             </View>
           </ScrollView>

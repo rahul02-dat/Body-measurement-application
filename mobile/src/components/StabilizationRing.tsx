@@ -14,10 +14,13 @@ export const StabilizationRing: React.FC<StabilizationRingProps> = ({
   onComplete,
 }) => {
   const pulseAnim = useRef(new Animated.Value(1)).current;
+  const hasTriggeredRef = useRef<boolean>(false);
 
   useEffect(() => {
+    let anim: Animated.CompositeAnimation | null = null;
     if (isActive) {
-      Animated.loop(
+      hasTriggeredRef.current = false;
+      anim = Animated.loop(
         Animated.sequence([
           Animated.timing(pulseAnim, {
             toValue: 1.15,
@@ -30,17 +33,25 @@ export const StabilizationRing: React.FC<StabilizationRingProps> = ({
             useNativeDriver: true,
           }),
         ])
-      ).start();
+      );
+      anim.start();
     } else {
       pulseAnim.setValue(1);
     }
+
+    return () => {
+      if (anim) {
+        anim.stop();
+      }
+    };
   }, [isActive]);
 
   useEffect(() => {
-    if (isActive && countdownSeconds === 0) {
+    if (isActive && countdownSeconds === 0 && !hasTriggeredRef.current) {
+      hasTriggeredRef.current = true;
       onComplete();
     }
-  }, [isActive, countdownSeconds]);
+  }, [isActive, countdownSeconds, onComplete]);
 
   if (!isActive) return null;
 

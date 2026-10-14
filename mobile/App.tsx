@@ -13,11 +13,11 @@ import { CapturedFrame, SessionData, UserDetailsState, WizardStep } from "./src/
 
 const INITIAL_DETAILS: UserDetailsState = {
   heightCm: 175.0,
-  weightKg: 70.0,
+  weightKg: null,
   heightUnit: "cm",
   weightUnit: "kg",
-  consentGiven: true,
-  retentionAgreed: true,
+  consentGiven: false,
+  retentionAgreed: false,
 };
 
 const INITIAL_SESSION: SessionData = {

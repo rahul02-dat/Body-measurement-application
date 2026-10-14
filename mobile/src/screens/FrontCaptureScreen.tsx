@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { CameraView, useCameraPermissions } from "expo-camera";
 import { LevelIndicator } from "../components/LevelIndicator";
@@ -19,11 +19,13 @@ export const FrontCaptureScreen: React.FC<FrontCaptureScreenProps> = ({
   onSwitchToLiveAR,
 }) => {
   const [permission, requestPermission] = useCameraPermissions();
+  const cameraRef = useRef<CameraView>(null);
   const [facing, setFacing] = useState<"front" | "back">("back");
   const [tiltDegrees, setTiltDegrees] = useState<number>(0.5);
   const [isAligned, setIsAligned] = useState<boolean>(true);
   const [countdownSeconds, setCountdownSeconds] = useState<number>(3);
   const [isCountingDown, setIsCountingDown] = useState<boolean>(false);
+  const [isProcessingCapture, setIsProcessingCapture] = useState<boolean>(false);
   const [instructionText, setInstructionText] = useState<string>(
     "Step back 2.5–3m. Align head & feet with dotted lines. Hold arms away 20°–30°."
   );
@@ -53,16 +55,42 @@ export const FrontCaptureScreen: React.FC<FrontCaptureScreenProps> = ({
     };
   }, [isAligned, tiltDegrees]);
 
-  const handleCaptureComplete = () => {
-    const frame: CapturedFrame = {
-      uri: "local://front_capture.jpg",
-      width: 1080,
-      height: 1920,
-      timestamp: Date.now(),
-      view: "front",
-      tiltAngleDegrees: tiltDegrees,
-    };
-    onCapture(frame);
+  const handleCaptureComplete = async () => {
+    if (isProcessingCapture) return;
+    setIsProcessingCapture(true);
+    try {
+      let uri = "local://front_capture.jpg";
+      let width = 1080;
+      let height = 1920;
+
+      if (cameraRef.current && permission?.granted) {
+        try {
+          const photo = await cameraRef.current.takePictureAsync({
+            quality: 0.85,
+            skipProcessing: true,
+          });
+          if (photo?.uri) {
+            uri = photo.uri;
+            width = photo.width || width;
+            height = photo.height || height;
+          }
+        } catch (e) {
+          console.warn("takePictureAsync fallback to mock frame:", e);
+        }
+      }
+
+      const frame: CapturedFrame = {
+        uri,
+        width,
+        height,
+        timestamp: Date.now(),
+        view: "front",
+        tiltAngleDegrees: tiltDegrees,
+      };
+      onCapture(frame);
+    } finally {
+      setIsProcessingCapture(false);
+    }
   };
 
   return (
@@ -92,6 +120,7 @@ export const FrontCaptureScreen: React.FC<FrontCaptureScreenProps> = ({
       <View style={styles.cameraViewport}>
         {permission?.granted ? (
           <CameraView
+            ref={cameraRef}
             style={StyleSheet.absoluteFill}
             facing={facing}
           />

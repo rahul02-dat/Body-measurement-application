@@ -138,8 +138,12 @@ export const ProcessingScreen: React.FC<ProcessingScreenProps> = ({
         <Text style={styles.statusText}>{currentStepText}</Text>
 
         <View style={styles.lockBadge}>
-          <Text style={styles.lockText}>🔒 100% Local Inference • No Cloud Uploads</Text>
+          <Text style={styles.lockText}>⚡ Mathematical Ellipse Pipeline • On-Device</Text>
         </View>
+
+        <Text style={styles.disclaimerText}>
+          Feasibility Prototype: Computes deterministic Ramanujan circumferences using scale anchor and silhouette bounds. Neural pose segmentation runs in the Python spike and requires a development build in mobile.
+        </Text>
       </View>
     </View>
   );
@@ -258,5 +262,12 @@ const styles = StyleSheet.create({
     color: "#04151F",
     fontSize: 15,
     fontWeight: "700",
+  },
+  disclaimerText: {
+    fontSize: 11,
+    color: colors.textMuted,
+    textAlign: "center",
+    marginTop: 16,
+    lineHeight: 16,
   },
 });

@@ -13,8 +13,8 @@
 
 import { PairScaleResult, ScaleCalibrationResult } from "../types";
 
-export const MIN_HEIGHT_CM = 50.0;
-export const MAX_HEIGHT_CM = 260.0;
+export const MIN_HEIGHT_CM = 100.0;
+export const MAX_HEIGHT_CM = 230.0;
 export const MIN_BODY_SPAN_PIXELS = 50;
 export const MAX_TORSO_TILT_DEGREES = 8.0;
 export const MAX_PAIR_SCALE_DISCREPANCY_FRACTION = 0.05; // 5%
@@ -62,7 +62,7 @@ export function calibrateScaleFromSpan(
 
   if (Math.abs(torsoTiltDegrees) > MAX_TORSO_TILT_DEGREES) {
     rejections.push(
-      `Torso tilt angle (${torsoTiltDegrees.toFixed(1)}°) exceeds maximum allowed (${MAX_TORSO_TILT_DEGREES}°).`
+      `Torso tilt angle (${torsoTiltDegrees.toFixed(1)}°) exceeds maximum allowed (${MAX_TORSO_TILT_DEGREES.toFixed(1)}°).`
     );
   }
 

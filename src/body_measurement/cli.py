@@ -5,6 +5,8 @@ import json
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Union
 
+import numpy as np
+
 from body_measurement.diagnostics import create_diagnostic_overlay, draw_cross_section_overlay
 from body_measurement.evaluation import (
     ParticipantPredictionRow,
@@ -282,7 +284,7 @@ def evaluate_manifest(
                         hip_abs_error_cm=round(abs(h_pred - h_true), 2),
                         chest_repeat_diff_cm=record.chest_rep_diff_cm,
                         waist_repeat_diff_cm=record.waist_rep_diff_cm,
-                        hip_repeat_diff_cm=record.hip_repeat_diff_cm,
+                        hip_repeat_diff_cm=record.hip_rep_diff_cm,
                     )
                 )
 
