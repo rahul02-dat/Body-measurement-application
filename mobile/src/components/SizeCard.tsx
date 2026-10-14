@@ -15,7 +15,7 @@ export const SizeCard: React.FC<SizeCardProps> = ({ sizing }) => {
     <View style={styles.card}>
       <View style={styles.headerRow}>
         <View>
-          <Text style={styles.categoryTitle}>{UNIQLO_ADULT_TOPS_CHART.garment_category}</Text>
+          <Text style={styles.categoryTitle}>{UNIQLO_ADULT_TOPS_CHART.garmentCategory}</Text>
           <Text style={styles.brandSubtitle}>Brand: {UNIQLO_ADULT_TOPS_CHART.brand}</Text>
         </View>
 

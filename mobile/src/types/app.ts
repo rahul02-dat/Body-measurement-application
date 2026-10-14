@@ -6,6 +6,7 @@ import { FullMeasurementEstimate } from "./index";
 
 export type WizardStep =
   | "DETAILS"
+  | "LIVE_CAMERA"
   | "FRONT_CAPTURE"
   | "SIDE_CAPTURE"
   | "PROCESSING"

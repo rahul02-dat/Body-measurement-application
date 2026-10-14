@@ -17,9 +17,14 @@ import { UserDetailsState } from "../types/app";
 interface DetailsScreenProps {
   initialDetails: UserDetailsState;
   onSubmit: (details: UserDetailsState) => void;
+  onStartLiveAR?: (details: UserDetailsState) => void;
 }
 
-export const DetailsScreen: React.FC<DetailsScreenProps> = ({ initialDetails, onSubmit }) => {
+export const DetailsScreen: React.FC<DetailsScreenProps> = ({
+  initialDetails,
+  onSubmit,
+  onStartLiveAR,
+}) => {
   const [heightCm, setHeightCm] = useState<string>(
     initialDetails.heightCm > 0 ? initialDetails.heightCm.toString() : "175.0"
   );
@@ -31,34 +36,52 @@ export const DetailsScreen: React.FC<DetailsScreenProps> = ({ initialDetails, on
   const [showPrivacyModal, setShowPrivacyModal] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  const handleStart = () => {
+  const validateDetails = (): UserDetailsState | null => {
     const parsedHeight = parseFloat(heightCm);
     const parsedWeight = weightKg.trim() ? parseFloat(weightKg) : null;
 
     if (isNaN(parsedHeight) || parsedHeight < 50 || parsedHeight > 260) {
       setErrorMessage("Please enter a valid height between 50 cm and 260 cm.");
-      return;
+      return null;
     }
 
     if (parsedWeight !== null && (isNaN(parsedWeight) || parsedWeight < 30 || parsedWeight > 300)) {
       setErrorMessage("Please enter a valid weight between 30 kg and 300 kg (or leave blank).");
-      return;
+      return null;
     }
 
     if (!consentGiven) {
       setErrorMessage("Informed consent is required to proceed with photo processing.");
-      return;
+      return null;
     }
 
     setErrorMessage(null);
-    onSubmit({
+    return {
       heightCm: parsedHeight,
       weightKg: parsedWeight,
       heightUnit: "cm",
       weightUnit: "kg",
       consentGiven,
       retentionAgreed,
-    });
+    };
+  };
+
+  const handleStartLive = () => {
+    const details = validateDetails();
+    if (details) {
+      if (onStartLiveAR) {
+        onStartLiveAR(details);
+      } else {
+        onSubmit(details);
+      }
+    }
+  };
+
+  const handleStartGuided = () => {
+    const details = validateDetails();
+    if (details) {
+      onSubmit(details);
+    }
   };
 
   return (
@@ -177,13 +200,22 @@ export const DetailsScreen: React.FC<DetailsScreenProps> = ({ initialDetails, on
           </View>
         )}
 
-        {/* Action Button */}
+        {/* Action Buttons */}
         <TouchableOpacity
           style={[styles.actionButton, !consentGiven && styles.actionButtonDisabled]}
-          onPress={handleStart}
+          onPress={handleStartLive}
           activeOpacity={0.8}
         >
-          <Text style={styles.actionButtonText}>Start Guided Capture →</Text>
+          <Text style={styles.actionButtonText}>⚡ Start Live Camera Measurements →</Text>
+          <Text style={styles.actionButtonSubtext}>Real-time video feed with live AR calipers & sizing</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[styles.secondaryButton, !consentGiven && styles.actionButtonDisabled]}
+          onPress={handleStartGuided}
+          activeOpacity={0.8}
+        >
+          <Text style={styles.secondaryButtonText}>📷 Guided 2-Photo Protocol (Front & Profile)</Text>
         </TouchableOpacity>
 
         {/* Privacy Notice Modal */}
@@ -347,5 +379,25 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "800",
     letterSpacing: 0.5,
+  },
+  actionButtonSubtext: {
+    color: "#0B3C53",
+    fontSize: 11,
+    fontWeight: "600",
+    marginTop: 3,
+  },
+  secondaryButton: {
+    backgroundColor: "rgba(30, 41, 59, 0.6)",
+    borderRadius: 14,
+    paddingVertical: 14,
+    alignItems: "center",
+    marginTop: 10,
+    borderWidth: 1,
+    borderColor: "rgba(51, 65, 85, 0.6)",
+  },
+  secondaryButtonText: {
+    color: colors.textSecondary,
+    fontSize: 14,
+    fontWeight: "700",
   },
 });

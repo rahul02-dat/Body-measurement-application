@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { CameraView, useCameraPermissions } from "expo-camera";
 import { LevelIndicator } from "../components/LevelIndicator";
 import { SilhouetteOverlay } from "../components/SilhouetteOverlay";
 import { StabilizationRing } from "../components/StabilizationRing";
@@ -9,9 +10,16 @@ import { CapturedFrame } from "../types/app";
 interface FrontCaptureScreenProps {
   onCapture: (frame: CapturedFrame) => void;
   onCancel: () => void;
+  onSwitchToLiveAR?: () => void;
 }
 
-export const FrontCaptureScreen: React.FC<FrontCaptureScreenProps> = ({ onCapture, onCancel }) => {
+export const FrontCaptureScreen: React.FC<FrontCaptureScreenProps> = ({
+  onCapture,
+  onCancel,
+  onSwitchToLiveAR,
+}) => {
+  const [permission, requestPermission] = useCameraPermissions();
+  const [facing, setFacing] = useState<"front" | "back">("back");
   const [tiltDegrees, setTiltDegrees] = useState<number>(0.5);
   const [isAligned, setIsAligned] = useState<boolean>(true);
   const [countdownSeconds, setCountdownSeconds] = useState<number>(3);
@@ -59,11 +67,42 @@ export const FrontCaptureScreen: React.FC<FrontCaptureScreenProps> = ({ onCaptur
 
   return (
     <View style={styles.container}>
+      {/* Top Banner with Flip Camera & Live Mode Switch */}
+      <View style={styles.topBar}>
+        <TouchableOpacity
+          style={styles.pillButton}
+          onPress={() => setFacing((prev) => (prev === "back" ? "front" : "back"))}
+          activeOpacity={0.7}
+        >
+          <Text style={styles.pillText}>🔄 {facing === "back" ? "Back" : "Front"}</Text>
+        </TouchableOpacity>
+
+        {onSwitchToLiveAR && (
+          <TouchableOpacity
+            style={[styles.pillButton, styles.livePillButton]}
+            onPress={onSwitchToLiveAR}
+            activeOpacity={0.7}
+          >
+            <Text style={styles.livePillText}>⚡ Live AR Measurements</Text>
+          </TouchableOpacity>
+        )}
+      </View>
+
       {/* Camera Viewport / Preview Layer */}
       <View style={styles.cameraViewport}>
-        <View style={styles.viewfinderBackdrop}>
-          <Text style={styles.viewfinderWatermark}>LIVE CAMERA FEED</Text>
-        </View>
+        {permission?.granted ? (
+          <CameraView
+            style={StyleSheet.absoluteFill}
+            facing={facing}
+          />
+        ) : (
+          <View style={styles.viewfinderBackdrop}>
+            <Text style={styles.viewfinderWatermark}>PREVIEW CAMERA ACTIVE</Text>
+            <TouchableOpacity style={styles.permBtn} onPress={requestPermission}>
+              <Text style={styles.permBtnText}>Grant Camera Permission</Text>
+            </TouchableOpacity>
+          </View>
+        )}
 
         {/* Level Indicator (pitch tilt) */}
         <LevelIndicator tiltDegrees={tiltDegrees} />
@@ -120,13 +159,45 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.background,
   },
+  topBar: {
+    height: 48,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: 16,
+    backgroundColor: "rgba(8, 12, 21, 0.9)",
+    borderBottomWidth: 1,
+    borderBottomColor: colors.cardBorder,
+  },
+  pillButton: {
+    backgroundColor: "rgba(30, 41, 59, 0.8)",
+    paddingVertical: 5,
+    paddingHorizontal: 10,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: "rgba(51, 65, 85, 0.5)",
+  },
+  pillText: {
+    fontSize: 11,
+    fontWeight: "700",
+    color: colors.textPrimary,
+  },
+  livePillButton: {
+    backgroundColor: "rgba(34, 211, 238, 0.15)",
+    borderColor: "#22D3EE",
+  },
+  livePillText: {
+    fontSize: 11,
+    fontWeight: "800",
+    color: "#22D3EE",
+  },
   cameraViewport: {
     flex: 1,
     position: "relative",
     overflow: "hidden",
   },
   viewfinderBackdrop: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     backgroundColor: "#0D1322",
     justifyContent: "center",
     alignItems: "center",
@@ -134,8 +205,20 @@ const styles = StyleSheet.create({
   viewfinderWatermark: {
     fontSize: 12,
     fontWeight: "800",
-    color: "rgba(51, 65, 85, 0.4)",
+    color: "rgba(51, 65, 85, 0.6)",
     letterSpacing: 2,
+    marginBottom: 10,
+  },
+  permBtn: {
+    backgroundColor: colors.primary,
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderRadius: 8,
+  },
+  permBtnText: {
+    color: "#04151F",
+    fontSize: 12,
+    fontWeight: "800",
   },
   controlsBar: {
     height: 110,

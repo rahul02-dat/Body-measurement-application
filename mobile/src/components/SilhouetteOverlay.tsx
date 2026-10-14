@@ -22,7 +22,7 @@ export const SilhouetteOverlay: React.FC<SilhouetteOverlayProps> = ({
     : colors.primary;
 
   return (
-    <View style={StyleSheet.absoluteFillObject} pointerEvents="none">
+    <View style={StyleSheet.absoluteFill} pointerEvents="none">
       {/* Top Head Alignment Line */}
       <View style={styles.topGuideContainer}>
         <View style={[styles.guideLine, { borderColor: guideColor }]} />

@@ -3,6 +3,7 @@ import { SafeAreaView, StatusBar, StyleSheet, View } from "react-native";
 import { Header } from "./src/components/Header";
 import { DetailsScreen } from "./src/screens/DetailsScreen";
 import { FrontCaptureScreen } from "./src/screens/FrontCaptureScreen";
+import { LiveCameraScreen } from "./src/screens/LiveCameraScreen";
 import { ProcessingScreen } from "./src/screens/ProcessingScreen";
 import { ResultsScreen } from "./src/screens/ResultsScreen";
 import { SideCaptureScreen } from "./src/screens/SideCaptureScreen";
@@ -31,25 +32,45 @@ export default function App() {
   const [currentStep, setCurrentStep] = useState<WizardStep>("DETAILS");
   const [session, setSession] = useState<SessionData>(INITIAL_SESSION);
 
-  // 1. Submit Details -> go to Front Capture
+  // 1. Submit Details -> Start Live Camera Feed & Measurements
+  const handleStartLiveCamera = (details: UserDetailsState) => {
+    setSession((prev) => ({ ...prev, details }));
+    setCurrentStep("LIVE_CAMERA");
+  };
+
+  // 2. Submit Details -> Guided 2-Photo Protocol
   const handleDetailsSubmit = (details: UserDetailsState) => {
     setSession((prev) => ({ ...prev, details }));
     setCurrentStep("FRONT_CAPTURE");
   };
 
-  // 2. Capture Front -> go to Side Capture
+  // 3. Live Measurements Locked -> Go directly to Results
+  const handleLiveMeasurementsLocked = (estimate: FullMeasurementEstimate) => {
+    setSession((prev) => ({ ...prev, estimate }));
+    setCurrentStep("RESULTS");
+  };
+
+  // 4. Update Height Anchor in live session
+  const handleUpdateHeight = (newHeightCm: number) => {
+    setSession((prev) => ({
+      ...prev,
+      details: { ...prev.details, heightCm: newHeightCm },
+    }));
+  };
+
+  // 5. Capture Front -> go to Side Capture
   const handleFrontCaptured = (frame: CapturedFrame) => {
     setSession((prev) => ({ ...prev, frontFrame: frame }));
     setCurrentStep("SIDE_CAPTURE");
   };
 
-  // 3. Capture Side -> go to Processing
+  // 6. Capture Side -> go to Processing
   const handleSideCaptured = (frame: CapturedFrame) => {
     setSession((prev) => ({ ...prev, sideFrame: frame }));
     setCurrentStep("PROCESSING");
   };
 
-  // 4. Processing Success -> go to Results
+  // 7. Processing Success -> go to Results
   const handleProcessingSuccess = (estimate: FullMeasurementEstimate) => {
     setSession((prev) => ({ ...prev, estimate }));
     setCurrentStep("RESULTS");
@@ -57,7 +78,7 @@ export default function App() {
 
   // Back Navigation Handler
   const handleBack = () => {
-    if (currentStep === "FRONT_CAPTURE") {
+    if (currentStep === "LIVE_CAMERA" || currentStep === "FRONT_CAPTURE") {
       setCurrentStep("DETAILS");
     } else if (currentStep === "SIDE_CAPTURE") {
       setCurrentStep("FRONT_CAPTURE");
@@ -89,6 +110,17 @@ export default function App() {
             <DetailsScreen
               initialDetails={session.details}
               onSubmit={handleDetailsSubmit}
+              onStartLiveAR={handleStartLiveCamera}
+            />
+          )}
+
+          {currentStep === "LIVE_CAMERA" && (
+            <LiveCameraScreen
+              session={session}
+              onLockMeasurements={handleLiveMeasurementsLocked}
+              onSwitchToGuidedCapture={() => setCurrentStep("FRONT_CAPTURE")}
+              onUpdateHeight={handleUpdateHeight}
+              onCancel={() => setCurrentStep("DETAILS")}
             />
           )}
 
@@ -96,6 +128,7 @@ export default function App() {
             <FrontCaptureScreen
               onCapture={handleFrontCaptured}
               onCancel={() => setCurrentStep("DETAILS")}
+              onSwitchToLiveAR={() => setCurrentStep("LIVE_CAMERA")}
             />
           )}
 

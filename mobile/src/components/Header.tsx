@@ -17,7 +17,8 @@ const STEPS: { key: WizardStep; label: string; number: number }[] = [
 ];
 
 export const Header: React.FC<HeaderProps> = ({ currentStep, onBack, onReset }) => {
-  const currentStepIndex = STEPS.findIndex((s) => s.key === currentStep);
+  const isLiveCamera = currentStep === "LIVE_CAMERA";
+  const currentStepIndex = isLiveCamera ? 1 : STEPS.findIndex((s) => s.key === currentStep);
 
   return (
     <View style={styles.container}>
@@ -29,7 +30,7 @@ export const Header: React.FC<HeaderProps> = ({ currentStep, onBack, onReset }) 
             </TouchableOpacity>
           ) : (
             <View style={styles.brandBadge}>
-              <Text style={styles.brandBadgeText}>MVP SPIKE</Text>
+              <Text style={styles.brandBadgeText}>{isLiveCamera ? "LIVE AR" : "MVP SPIKE"}</Text>
             </View>
           )}
         </View>
@@ -48,8 +49,9 @@ export const Header: React.FC<HeaderProps> = ({ currentStep, onBack, onReset }) 
       {/* Step Progress Indicators */}
       <View style={styles.progressRow}>
         {STEPS.map((step, idx) => {
-          const isActive = step.key === currentStep;
+          const isActive = step.key === currentStep || (isLiveCamera && step.key === "FRONT_CAPTURE");
           const isCompleted = currentStepIndex > idx;
+          const label = isLiveCamera && step.key === "FRONT_CAPTURE" ? "Live AR" : step.label;
 
           return (
             <React.Fragment key={step.key}>
@@ -78,7 +80,7 @@ export const Header: React.FC<HeaderProps> = ({ currentStep, onBack, onReset }) 
                     isCompleted && styles.stepLabelCompleted,
                   ]}
                 >
-                  {step.label}
+                  {label}
                 </Text>
               </View>
 
