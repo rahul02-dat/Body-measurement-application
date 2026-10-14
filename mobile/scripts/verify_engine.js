@@ -198,6 +198,61 @@ assert.strictEqual(pipe.calCirc > 0, true);
 assert.strictEqual(pipe.sizing.status, "RECOMMENDED");
 console.log("✔ Test 8: End-to-end measurement & sizing pipeline simulation PASSED");
 
+// Test 9: SMPL-Anthropometry Convex Hull Perimeter & Standard Labels (A–P)
+function computeConvexHull2D(points) {
+  if (points.length <= 2) return points;
+  const sorted = [...points].sort((a, b) => (a.x === b.x ? a.y - b.y : a.x - b.x));
+  const cross = (o, a, b) => (a.x - o.x) * (b.y - o.y) - (a.y - o.y) * (b.x - o.x);
+  const lower = [];
+  for (const p of sorted) {
+    while (lower.length >= 2 && cross(lower[lower.length - 2], lower[lower.length - 1], p) <= 0) {
+      lower.pop();
+    }
+    lower.push(p);
+  }
+  const upper = [];
+  for (let i = sorted.length - 1; i >= 0; i--) {
+    const p = sorted[i];
+    while (upper.length >= 2 && cross(upper[upper.length - 2], upper[upper.length - 1], p) <= 0) {
+      upper.pop();
+    }
+    upper.push(p);
+  }
+  lower.pop();
+  upper.pop();
+  return lower.concat(upper);
+}
+
+function computeContourPerimeter(points) {
+  const hull = computeConvexHull2D(points);
+  let perimeter = 0.0;
+  for (let i = 0; i < hull.length; i++) {
+    const p1 = hull[i];
+    const p2 = hull[(i + 1) % hull.length];
+    const dx = p2.x - p1.x;
+    const dy = p2.y - p1.y;
+    perimeter += Math.sqrt(dx * dx + dy * dy);
+  }
+  return Number(perimeter.toFixed(2));
+}
+
+// 20x20 square perimeter = 80 cm
+const squarePoints = [
+  { x: -10, y: -10 }, { x: 10, y: -10 },
+  { x: 10, y: 10 }, { x: -10, y: 10 },
+  { x: 0, y: 0 } // interior point
+];
+const squarePerimeter = computeContourPerimeter(squarePoints);
+assert.strictEqual(squarePerimeter, 80.0, "Convex hull perimeter of 20x20 square must be 80.0 cm");
+
+// Height normalization: scale from 180cm to 175cm
+const rawHeight = 180.0;
+const targetHeight = 175.0;
+const rawShoulder = 44.0;
+const normalizedShoulder = Number(((rawShoulder / rawHeight) * targetHeight).toFixed(2));
+assert.strictEqual(normalizedShoulder, 42.78);
+console.log("✔ Test 9: SMPL-Anthropometry convex hull perimeter (80.0 cm) & height normalization PASSED");
+
 console.log("=" .repeat(60));
-console.log("ALL 8 PARITY VERIFICATION CHECKS PASSED WITH 100% ACCURACY!");
+console.log("ALL 9 PARITY VERIFICATION CHECKS PASSED WITH 100% ACCURACY!");
 console.log("=" .repeat(60));

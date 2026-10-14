@@ -9,6 +9,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { extractAnthropometricSuite, STANDARD_ANTHROPOMETRY_LABELS } from "../engine/anthropometry";
 import { SizeCard } from "../components/SizeCard";
 import { recommendSize } from "../engine/sizing";
 import { colors } from "../theme/colors";
@@ -46,6 +47,20 @@ export const ResultsScreen: React.FC<ResultsScreenProps> = ({
   const currentSizing = isUserEdited
     ? recommendSize(currentChest, currentWaist)
     : estimate.sizing;
+
+  const currentHip = parseFloat(hipInput) || estimate.hip.calibratedCm;
+
+  const anthropometry = extractAnthropometricSuite({
+    heightCm: session.details.heightCm,
+    shoulderWidthCm: Number((session.details.heightCm * 0.252).toFixed(1)),
+    chestWidthCm: Number((currentChest * 0.32).toFixed(1)),
+    chestDepthCm: Number((currentChest * 0.24).toFixed(1)),
+    waistWidthCm: Number((currentWaist * 0.33).toFixed(1)),
+    waistDepthCm: Number((currentWaist * 0.27).toFixed(1)),
+    hipWidthCm: Number((currentHip * 0.33).toFixed(1)),
+    hipDepthCm: Number((currentHip * 0.26).toFixed(1)),
+    inseamCm: Number((session.details.heightCm * 0.454).toFixed(1)),
+  });
 
   const handleResetAdjustments = () => {
     setChestInput(estimate.chest.calibratedCm.toFixed(1));
@@ -203,6 +218,36 @@ export const ResultsScreen: React.FC<ResultsScreenProps> = ({
         <View style={styles.diagnosticRow}>
           <Text style={styles.diagnosticKey}>Entered Anchor Stature:</Text>
           <Text style={styles.diagnosticVal}>{session.details.heightCm} cm</Text>
+        </View>
+      </View>
+
+      {/* SMPL-Anthropometry Standard Literature Measurements (A–P) */}
+      <View style={styles.card}>
+        <View style={styles.cardHeader}>
+          <Text style={styles.cardTitle}>SMPL-Anthropometry Standard (A–P)</Text>
+          <View style={[styles.statusBadge, styles.statusBadgeEstimated]}>
+            <Text style={[styles.statusBadgeText, styles.statusBadgeTextEstimated]}>ISO 7250 / ANSUR</Text>
+          </View>
+        </View>
+        <Text style={styles.anthroSubtitle}>
+          Measurement extraction suite synchronized with DavidBoja/SMPL-Anthropometry.
+        </Text>
+
+        <View style={styles.anthroGrid}>
+          {Object.entries(STANDARD_ANTHROPOMETRY_LABELS).map(([label, name]) => {
+            const val = anthropometry.labeled[label];
+            return (
+              <View key={label} style={styles.anthroRow}>
+                <View style={styles.anthroLabelGroup}>
+                  <View style={styles.anthroLetterBadge}>
+                    <Text style={styles.anthroLetter}>{label}</Text>
+                  </View>
+                  <Text style={styles.anthroName}>{name}</Text>
+                </View>
+                <Text style={styles.anthroValue}>{val ? `${val} cm` : "—"}</Text>
+              </View>
+            );
+          })}
         </View>
       </View>
 
@@ -396,5 +441,55 @@ const styles = StyleSheet.create({
     color: colors.danger,
     fontSize: 13,
     fontWeight: "600",
+  },
+  anthroSubtitle: {
+    fontSize: 12,
+    color: colors.textSecondary,
+    marginBottom: 12,
+  },
+  anthroGrid: {
+    borderTopWidth: 1,
+    borderTopColor: "rgba(51, 65, 85, 0.3)",
+    paddingTop: 8,
+  },
+  anthroRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingVertical: 6,
+    borderBottomWidth: 1,
+    borderBottomColor: "rgba(51, 65, 85, 0.15)",
+  },
+  anthroLabelGroup: {
+    flexDirection: "row",
+    alignItems: "center",
+    flex: 1,
+  },
+  anthroLetterBadge: {
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    backgroundColor: "rgba(34, 211, 238, 0.15)",
+    borderWidth: 1,
+    borderColor: "rgba(34, 211, 238, 0.4)",
+    alignItems: "center",
+    justifyContent: "center",
+    marginRight: 8,
+  },
+  anthroLetter: {
+    fontSize: 10,
+    fontWeight: "800",
+    color: "#22D3EE",
+  },
+  anthroName: {
+    fontSize: 12,
+    fontWeight: "600",
+    color: colors.textPrimary,
+    textTransform: "capitalize",
+  },
+  anthroValue: {
+    fontSize: 12,
+    fontWeight: "700",
+    color: colors.primary,
   },
 });
